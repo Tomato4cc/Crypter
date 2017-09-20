@@ -165,7 +165,7 @@ class Crypter(QMainWindow, Ui_Crypter):
                     o.close()
             #Also support batch unzlibbing if the dragged object is a dir
             elif(os.path.isdir(url)):
-                exts = ['.dds', '.bin', '.xml', '.mtl'] #List of filetypes to process
+                exts = ['.dds', '.bin', '.xml', '.mtl', '.lua'] #List of filetypes to process
                 os.makedirs(self.unzl, exist_ok=True) #Make temp directory since it's needed
                 for r, d, f in os.walk(url): #Go through the whole folder
                     for file in f:
@@ -209,7 +209,7 @@ class Crypter(QMainWindow, Ui_Crypter):
                     comp.close()
                 #Also support batch zlibbing if the dragged object is a dir
             elif(os.path.isdir(url)):
-                exts = ['.dds'] #List of filetypes to process
+                exts = ['.dds', '.bin'] #List of filetypes to process
                 os.makedirs(self.zl, exist_ok=True) #Make temp directory since it's needed
                 for r, d, f in os.walk(url): #Go through the whole folder
                     for file in f:

@@ -45,7 +45,7 @@ class DnDBox(QtWidgets.QGroupBox):
 class Ui_Crypter(object):
     def setupUi(self, Crypter):
         Crypter.setObjectName("Crypter")
-        Crypter.resize(700, 700)
+        Crypter.resize(500, 500)
         self.centralWidget = QtWidgets.QWidget(Crypter)
         self.centralWidget.setObjectName("centralWidget")
         self.decryb = DnDBox(self.centralWidget)
