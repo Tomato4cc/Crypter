@@ -69,10 +69,38 @@ class Ui_Crypter(object):
         self.zlibb.setObjectName("zlibb")
         self.zlibb.setStyleSheet("border-image: url(img/zlib.png) 0 0 0 0 stretch stretch;")
         Crypter.setCentralWidget(self.centralWidget)
+        
+        
         self.menuBar = QtWidgets.QMenuBar(Crypter)
-        self.menuBar.setGeometry(QtCore.QRect(0, 0, 700, 26))
+        self.menuBar.setGeometry(QtCore.QRect(0, 0, 500, 26))
         self.menuBar.setObjectName("menuBar")
+        self.menuFile = QtWidgets.QMenu(self.menuBar)
+        self.menuFile.setObjectName("menuFile")
+        self.menuSettings = QtWidgets.QMenu(self.menuBar)
+        self.menuSettings.setObjectName("menuSettings")
+        self.menumode = QtWidgets.QMenu(self.menuSettings)
+        self.menuSettings.addMenu(self.menumode)
         Crypter.setMenuBar(self.menuBar)
+        
+        self.exita = QtWidgets.QAction(Crypter)
+        self.prefixa = QtWidgets.QAction(Crypter)
+        self.prefixa.setCheckable(True)
+        self.prefixa.setChecked(True)
+        self.backupa = QtWidgets.QAction(Crypter)
+        self.backupa.setCheckable(True)
+        self.fagroup = QtWidgets.QActionGroup(self.menuBar)
+        self.fagroup.addAction(self.prefixa)
+        self.fagroup.addAction(self.backupa)
+        self.staytopa = QtWidgets.QAction(Crypter)
+        self.staytopa.setCheckable(True)
+        
+        self.menuFile.addAction(self.exita)
+        self.menumode.addAction(self.prefixa)
+        self.menumode.addAction(self.backupa)
+        self.menuSettings.addAction(self.staytopa)
+        
+        self.menuBar.addAction(self.menuFile.menuAction())
+        self.menuBar.addAction(self.menuSettings.menuAction())
         
         self.lo = QtWidgets.QGridLayout()
         self.lo.addWidget(self.decryb, 0, 0)
@@ -87,4 +115,11 @@ class Ui_Crypter(object):
     def retranslateUi(self, Crypter):
         _translate = QtCore.QCoreApplication.translate
         Crypter.setWindowTitle(_translate("Crypter", "Crypter"))
+        self.menuFile.setTitle(_translate("Crypter", "File"))
+        self.menuSettings.setTitle(_translate("Crypter", "Settings"))
+        self.menumode.setTitle(_translate("Crypter", "Mode"))
+        self.exita.setText(_translate("Crypter", "Exit"))
+        self.prefixa.setText(_translate("Crypter", "Prefix"))
+        self.backupa.setText(_translate("Crypter", "Backup"))
+        self.staytopa.setText(_translate("Crypter", "Stay on Top"))
 

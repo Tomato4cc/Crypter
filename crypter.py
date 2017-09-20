@@ -26,6 +26,8 @@ class Crypter(QMainWindow, Ui_Crypter):
         self.encryb.dropped.connect(self.encrypt)
         self.unzlibb.dropped.connect(self.unzlib)
         self.zlibb.dropped.connect(self.zlib)
+        self.staytopa.toggled.connect(self.staytop)
+        self.exita.triggered.connect(self.closef)
         
         self.root = os.path.dirname(os.path.realpath(__file__)) #Store the script root dir
         self.temp = os.path.join(self.root, 'temp') #Store the temp dir
@@ -157,12 +159,28 @@ class Crypter(QMainWindow, Ui_Crypter):
                     if(head == b'WESYS'):
                         o.seek(16,0) #Skip the file header and the PES header
                         dat = o.read() #Read the actual compressed data
-                        decomp = open(os.path.join(os.path.dirname(url), "unzlibbed_" + os.path.basename(url)), 'wb')
+                        #Use .backup system if needed
+                        if(self.backupa.isChecked()):
+                            #Open .backup for writing
+                            bak = open(os.path.join(os.path.dirname(url), os.path.basename(url) + ".backup"), 'wb')
+                            o.seek(0) #Go back to the start of the original file
+                            bak.write(o.read()) #Dump original file into .backup
+                            bak.close()
+                            o.close()
+                            
+                            #Then write unzlibbed data into original file
+                            decomp = open(url, 'wb')
+                        #Otherwise use prefix system
+                        else:
+                            decomp = open(os.path.join(os.path.dirname(url), "unzlibbed_" + os.path.basename(url)), 'wb')
+                            o.close()
+                        
                         cdat = zlib.decompress(dat, 32) #Decompress the data
                         decomp.write(cdat)
                         decomp.flush()
                         decomp.close()
-                    o.close()
+                    else:
+                        o.close()
             #Also support batch unzlibbing if the dragged object is a dir
             elif(os.path.isdir(url)):
                 exts = ['.dds', '.bin', '.xml', '.mtl', '.lua'] #List of filetypes to process
@@ -199,7 +217,19 @@ class Crypter(QMainWindow, Ui_Crypter):
                 #PES zlibbed files always start with 0x000101 WESYS
                 if(h[0] != 1459683584 and h[1] != 1398362949):
                     #File is not zlibbed yet, get to work
-                    comp = open(os.path.join(os.path.dirname(url), "zlibbed_" + os.path.basename(url)), 'wb')
+                    #Use backup system if needed
+                    if(self.backupa.isChecked()):
+                        #Open .backup for writing
+                        bak = open(os.path.join(os.path.dirname(url), os.path.basename(url) + ".backup"), 'wb')
+                        bak.write(dat) #Dump original file into .backup
+                        bak.close()
+                        
+                        #Then write unzlibbed data into original file
+                        comp = open(url, 'wb')
+                    #Otherwise use prefix system
+                    else:
+                        comp = open(os.path.join(os.path.dirname(url), "zlibbed_" + os.path.basename(url)), 'wb')
+                    
                     cdat = zlib.compress(dat, 9) #Compress the whole file with the highest level of compression
                     #Write the compressed data in the PES special format.
                     #Start with the 0x000101 WESYS, then length of the compressed data, then length of the original data
@@ -233,6 +263,21 @@ class Crypter(QMainWindow, Ui_Crypter):
                                 comp.write(cdat) #Write compressed data
                                 comp.flush()
                                 comp.close()
+    
+    #Make the window stay on top if required
+    def staytop(self, checked):
+        if(checked == True):
+            #Set the WindowStaysOnTopHint window flag
+            self.setWindowFlags(self.windowFlags() | Qt.WindowStaysOnTopHint)
+            self.show() #Redraw the window to apply the changes
+        else:
+            #Unset the WindowStaysOnTopHint window flag
+            self.setWindowFlags(self.windowFlags() & ~Qt.WindowStaysOnTopHint)
+            self.show() #Redraw the window to apply the changes
+    
+    #Simply end the process if Exit is clicked
+    def closef(self):
+        sys.exit(0)
     
 if __name__ == "__main__":
     p = QApplication(sys.argv)
