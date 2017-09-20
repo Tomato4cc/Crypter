@@ -1,5 +1,5 @@
 Alternative PES file crypter v1.0. Supports decryption/encryption of PES
-EDIT files and zlibbing/unzlibbing of several filetypes either one-by-one
+EDIT files and zlibbing/unzlibbing of various filetypes either one-by-one
 or in larger batches inside a folder.
 
 Usage:
@@ -20,6 +20,21 @@ Usage:
    function will zlib every supported file inside that folder and place
    them in the "zlibbed" folder at the tool's root directory.
    
+Settings:
+  - Mode:
+    - This changes how files are renamed when using the zlib functions.
+	- Prefix (default) adds a "(un)zlibbed_" prefix to the output file and
+	  the input file gets to keep its original filename.
+	- Backup adds a ".backup" suffix to the original file, thus making a
+      backup copy of the original, and replaces the original with the output 
+	  file.
+  - Stay on Top:
+    - If set, the window will always try to stay on top of all the other
+	  windows. Useful if you're shuffling around with several input files
+	  from several different folders.
+	- NOTE: The flicker effect is normal. It happens because the window
+	  needs to be re-drawn so the change can take effect.
+	  
 Building:
   - .exe releases are built with pyinstaller. The standard build command for
     a release is `pyinstaller -F -w -i icon.ico crypter.py`. Only the .py, 
