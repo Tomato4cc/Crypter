@@ -93,6 +93,7 @@ class Ui_Crypter(object):
         self.fagroup.addAction(self.backupa)
         self.staytopa = QtWidgets.QAction(Crypter)
         self.staytopa.setCheckable(True)
+        self.staytopa.setChecked(False)
         
         self.menuFile.addAction(self.exita)
         self.menumode.addAction(self.prefixa)

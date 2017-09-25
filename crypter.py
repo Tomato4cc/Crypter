@@ -20,7 +20,7 @@ class Crypter(QMainWindow, Ui_Crypter):
         super().__init__(parent)
         self.setupUi(self)
         self.setWindowIcon(QIcon('img/icon.png'))
-
+        
         #Connect signals
         self.decryb.dropped.connect(self.decrypt)
         self.encryb.dropped.connect(self.encrypt)
@@ -86,26 +86,21 @@ class Crypter(QMainWindow, Ui_Crypter):
         for url in urll:
             if(os.path.isfile(url)):
                 b = open(url, 'rb') #Open file for reading
-                head = b.read(9).decode('utf-8') #Read "header" from file
+                #head = b.read(9).decode('utf-8') #Read "header" from file
                 #Check if file at least starts correctly.
-                if(head == "Edit Data"):
-                    _DESCL = 384 #Description length
+                if(b):
                     _HEADL = 208 #Header length
                     _ENCHL = 320 #Encryption header length
-                    _VERSL = 90 #Version string length
-                    _LOGOL = 66179 #Logo length, static for now
-                    #Then figure data length from the other lengths
-                    _DATAL = os.stat(url).st_size - _DESCL - _HEADL - _ENCHL - _VERSL - _LOGOL
+                    
+                    #Read other sizes from the header
+                    b.seek(384) #Skip Description
+                    b.seek(64, 1) #Skip mystery data in header
+                    _DATAL = struct.unpack('<I', b.read(4))[0]
+                    _LOGOL = struct.unpack('<I', b.read(4))[0]
+                    _DESCL = struct.unpack('<I', b.read(4))[0]
+                    _VERSL = struct.unpack('<I', b.read(4))[0]*2
                     
                     fname = os.path.basename(url) #Get filename from url
-                    
-                    '''#Figure out logo length. No idea why anyone would want to
-                    #change this but do it for consistency's sake
-                    b.seek(_DESCL + _HEADL + _ENCHL + _VERL) #Skip other data
-                    b.seek(8, 1) #Skip PNG header
-                    pnglen = 0
-                    while(true):
-                        clen = '''
                         
                     os.makedirs(self.temp, exist_ok=True) #Make temp directory since it's needed
                     b.seek(0) #Get back to the beginning of the source file
@@ -239,7 +234,7 @@ class Crypter(QMainWindow, Ui_Crypter):
                     comp.close()
                 #Also support batch zlibbing if the dragged object is a dir
             elif(os.path.isdir(url)):
-                exts = ['.dds', '.bin'] #List of filetypes to process
+                exts = ['.dds'] #List of filetypes to process
                 os.makedirs(self.zl, exist_ok=True) #Make temp directory since it's needed
                 for r, d, f in os.walk(url): #Go through the whole folder
                     for file in f:
@@ -268,11 +263,12 @@ class Crypter(QMainWindow, Ui_Crypter):
     def staytop(self, checked):
         if(checked == True):
             #Set the WindowStaysOnTopHint window flag
-            self.setWindowFlags(self.windowFlags() | Qt.WindowStaysOnTopHint)
+            self.setWindowFlags(self.windowFlags() | Qt.CustomizeWindowHint | Qt.WindowStaysOnTopHint)
             self.show() #Redraw the window to apply the changes
         else:
+            print("Unchecked")
             #Unset the WindowStaysOnTopHint window flag
-            self.setWindowFlags(self.windowFlags() & ~Qt.WindowStaysOnTopHint)
+            self.setWindowFlags(self.windowFlags() & ~Qt.CustomizeWindowHint & ~Qt.WindowStaysOnTopHint)
             self.show() #Redraw the window to apply the changes
     
     #Simply end the process if Exit is clicked
